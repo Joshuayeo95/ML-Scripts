@@ -22,4 +22,23 @@ def cleanHeaders(df, remove_whitespace=True, replace_dash=False, lowercase=False
             Formatted dataframe.
     
     '''
+    if remove_whitespace:
+        df.columns = df.columns.str.strip()
+        print('Removing whitespaces ...')
+    
+    if replace_dash:
+        df.columns = df.columns.str.replace('-', '_')
+        print('Replacing dashes with underscores ...')
 
+    if lowercase:
+        df.columns = df.columns.str.lower()
+        print('Changing to lower case ...')
+    
+    if uppercase:
+        df.columns = df.columns.str.upper()
+        print('Changing to upper case ...')
+    
+    print('Dataframe column headers have been formatted.')
+    
+    return df
+    
