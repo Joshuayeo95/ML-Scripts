@@ -122,3 +122,27 @@ def create_time_vars(df, time_var, year=True, month=True, day=True, season=True,
        print('Datetime variable has been dropped.')
     
     return df
+
+
+def convert_to_categorical(df, add_vars=[]):
+    '''Function to change variable datatypes to categorical data type.
+    Arguments:
+        df : Pandas DataFrame
+            Dataframe to format.
+        add_vars : list of variable names 
+            Additional variables to change their data type to categorical.
+        
+    Returns:
+        df : Pandas DataFrame
+            Formated Dataframe.
+
+    '''
+    cat_vars = df.select_dtypes(exclude='number').columns.to_list()
+    
+    if len(add_vars) > 0:
+        [cat_vars.append(x) for x in add_vars]
+    
+    for var in cat_vars:
+        df[var] = df[var].astype('category')
+    
+    return df
