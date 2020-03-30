@@ -1,3 +1,5 @@
+import pandas as pd
+import numpy as np
 
 
 ## TODO: Functions for cleaning headers, creating new time variables, show variables with missing values, 
@@ -67,6 +69,40 @@ def check_missing(df):
         print('The dataframe has no variables that are missing values.')
 
     return missing_percentages
+
+
+def check_negative(df, exclude_vars=[]):
+    '''Function that check the numeric columns and determines if they are all non-negative.
+    Arguments:
+        df : Pandas DataFrame
+            Dataframe to be checked.
+        exclude_vars : list
+            List of variables names to exclude from the check.
+    '''
+    numeric_vars = df.select_dtypes(include='number').columns.to_list()
+    vars_to_check = [var for var in numeric_vars if var not in exclude_vars]
+    neg_values = [] 
+
+    for var in vars_to_check:
+        neg_values.append(any(df[var] < 0))
+
+    results = pd.DataFrame.from_dict(
+        dict(zip(vars_to_check, neg_values)),
+        orient='index',
+        columns=['NegativeValues']
+    )
+
+    if results.NegativeValues.mean() > 0:
+        neg_vars_count = results.NegativeValues.loc[results.NegativeValues == 1].count()
+        print(f'There are {neg_vars_count} variables with negative values.')
+        print('To view variables, please save results.')
+    
+    else:
+        print('There are no numeric variables with negative values.')
+    
+    return results
+    
+
 
 
 
