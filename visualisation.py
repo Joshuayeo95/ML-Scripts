@@ -6,7 +6,16 @@ Updated : 29 Mar 2020
 import matplotlib.pyplot as plt
 import seaborn as sns
 from matplotlib.colors import ListedColormap
+import chart_studio.plotly as py
+import plotly.graph_objects as go
+import plotly.express as px
+from plotly.subplots import make_subplots
 
+
+def cap_first(string):
+    '''Function to capitalize the first letter of the string without altering the rest of it.
+    '''
+    return string[:1].upper() + string[1:]
 
 def annotate_plot(ax, dec_places=1, annot_size=14):
     '''Function that annotates plots with their value labels.
@@ -55,10 +64,10 @@ def count_pie_plots(df, var, figsize=(8,4), palette='pastel', remove_yticks=True
     n_categories = category_distributions.size
     
     # Count Plot
-    ax1.set_title(f'{var.capitalize()} Categories Count', size=16, pad=20)
+    ax1.set_title(f'{cap_first(var)} Categories Count', size=16, pad=20)
     sns.countplot(x=var, data=df, palette=palette, order=sorted_order, ax=ax1)
     ax1.set_ylabel('Frequency', size=14)
-    ax1.set_xlabel(f'{var.capitalize()}', size=14)
+    ax1.set_xlabel(f'{cap_first(var)}', size=14)
     if remove_yticks:
         ax1.set_yticklabels([])
 
@@ -67,7 +76,7 @@ def count_pie_plots(df, var, figsize=(8,4), palette='pastel', remove_yticks=True
     # Pie Plot
     pie_cmap = ListedColormap(sns.color_palette(palette, n_categories)).colors
 
-    ax2.set_title(f'{var.capitalize()} Category Distributions', size=16, pad=20)
+    ax2.set_title(f'{cap_first(var)} Category Distributions', size=16, pad=20)
     ax2 = plt.pie(
         x=sorted_values,
         labels=sorted_order,
@@ -87,7 +96,7 @@ def count_pie_plots(df, var, figsize=(8,4), palette='pastel', remove_yticks=True
     sns.despine() 
     plt.show();
 
-
+## TODO : Add kwargs to change category names in the x-axis
 def barplot_with_hue(df, var, target, y_label='Percentage', figsize=(6,4), palette='pastel', remove_yticks=True, dec_places=1, annot_size=14):
     '''Function to plot the distribution of categorical variables with the target as the hue.
     Arguments:
@@ -124,9 +133,9 @@ def barplot_with_hue(df, var, target, y_label='Percentage', figsize=(6,4), palet
         palette=palette
     )
 
-    ax.set_title(f'{var.capitalize()} Churn Rate Per Category', fontsize=16, pad=20)
+    ax.set_title(f'Churn Rate for Variable : {cap_first(var)}', fontsize=16, pad=20)
     ax.set_ylabel(y_label, fontsize=14)
-    ax.set_xlabel(f'{var.capitalize()}', fontsize=14)
+    ax.set_xlabel(f'{cap_first(var)}', fontsize=14)
     ax.legend(
         loc='center left',
         bbox_to_anchor=(1.02,0.5),
@@ -138,3 +147,38 @@ def barplot_with_hue(df, var, target, y_label='Percentage', figsize=(6,4), palet
 
     sns.despine()
     plt.show();
+
+
+
+def interactive_boxplot(df, x_var, y_var, hue=False, hue_var='', plot_size=(400, 800)):
+    '''Function that uses Plotly to plot interactive barplots that with hue.
+    Arguments:
+        df : Pandas DataFrame
+            Dataframe from which the variables will be extracted.
+        x_var : str
+            Name of variable to be plotted on the x-axis.
+        y_var : str
+            Name of variable to be plotted on the y-axis
+        hue : bool
+            Include hue for different categories.
+        hue_var : str
+            Name of variable to be used as hue.
+        plot_size : tuple
+            Height and width for the figure respectively.
+
+    '''
+    if hue:
+        fig = px.box(df, x=x_var, y=y_var, color=hue_var)
+    
+    else:
+        fig = px.box(df, x=x_var, y=y_var) 
+    
+    fig.update_layout(
+        height=plot_size[0],
+        width=plot_size[1],
+        title=f'Categorical Boxplots for Variable : {cap_first(x_var)}',
+        paper_bgcolor='rgb(243,243,243)',
+        plot_bgcolor='rgb(243,243,243)'
+    )
+
+    fig.show()
