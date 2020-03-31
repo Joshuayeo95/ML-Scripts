@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-
+from sklearn.preprocessing import LabelEncoder
 
 ## TODO: Functions for cleaning headers, creating new time variables, show variables with missing values, 
 
@@ -25,7 +25,7 @@ def clean_headers(df, remove_whitespace=True, replace_dash=False, lowercase=Fals
     
     '''
     if remove_whitespace:
-        df.columns = df.columns.str.strip()
+        df.columns = df.columns.str.replace(' ', '')
         print('Removing whitespaces ...')
     
     if replace_dash:
@@ -182,3 +182,31 @@ def convert_to_categorical(df, add_vars=[]):
         df[var] = df[var].astype('category')
     
     return df
+
+
+def label_encode(df,exclude_list=[]):
+    ''' Funciton that label encodes categorical varaibles that have two or less unique categories.
+    Arguments:
+        df : Pandas DataFrame
+            Dataframe of which its variables will be encoded.
+        exclude_list : list
+            List of variable names to be excluded from the encoding.
+    
+    Returns:
+        df : Pandas DataFrame
+            Dataframe with variables encoded.
+    ''' 
+    cat_vars = df.select_dtypes(include='category').columns.to_list()
+    vars_to_encode = [x for x in cat_vars if x not in exclude_list]
+    encoder = LabelEncoder()
+
+    for var in vars_to_encode:
+        if len(list(df[var].unique())) <= 2:
+            df[var] = encoder.fit_transform(df[var])
+
+    print(f'A total of {len(vars_to_encode)} variables have been encoded.')
+
+    return df
+
+    
+    
